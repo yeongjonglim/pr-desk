@@ -3,7 +3,7 @@ import type { Load } from "../api/desk";
 import { BUSY_AT, type PendingPr, type ReviewerLoad } from "../model/reviewers";
 import { ago, agoLong, days } from "../model/time";
 import type { Person } from "../model/types";
-import { Avatar, displayName } from "./bits";
+import { Avatar, displayName, StateBadge } from "./bits";
 import { teamsList } from "./copy";
 import { CopyButton } from "./CopyButton";
 
@@ -93,7 +93,8 @@ export function Reviewers({ load, me, selected, onSelect }: Props) {
                       <div className="refs">
                         {!isMe &&
                           l.mine.map((p) => (
-                            <span key={`${p.repoFull}#${p.number}`} className={`ref ${days(p.since) > 30 ? "stale" : days(p.since) < 1 ? "new" : ""}`} title={p.title}>
+                            <span key={`${p.repoFull}#${p.number}`} className={`ref ${days(p.since) > 30 ? "stale" : days(p.since) < 1 ? "new" : ""}`} title={`${p.title} · ${p.state === "changes" ? "changes requested" : p.state}`}>
+                              <i className={`sd ${p.state}`} />
                               {p.repo}#{p.number}
                             </span>
                           ))}
@@ -117,7 +118,10 @@ export function Reviewers({ load, me, selected, onSelect }: Props) {
 function PendingRow({ p, showAuthor }: { p: PendingPr; showAuthor: boolean }) {
   return (
     <a className="prow" href={p.url} target="_blank" rel="noreferrer">
-      <div className="prow-t">{p.title}</div>
+      <div className="prow-top">
+        <div className="prow-t">{p.title}</div>
+        <StateBadge state={p.state} compact />
+      </div>
       <div className="prow-m">
         <span className="mono">
           {p.repo}#{p.number}
@@ -131,7 +135,6 @@ function PendingRow({ p, showAuthor }: { p: PendingPr; showAuthor: boolean }) {
         <span>
           +{p.additions.toLocaleString("en")} −{p.deletions.toLocaleString("en")}
         </span>
-        {p.isDraft && <span>draft</span>}
         <span className={`since ${oldTone(p.since)}`}>asked {ago(p.since)} ago</span>
       </div>
     </a>

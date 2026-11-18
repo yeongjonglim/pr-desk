@@ -1,17 +1,20 @@
 import {
+  Check,
   CircleDashed,
   CircleX,
   Clock,
   Eye,
   GitMerge,
+  GitPullRequest,
   GitPullRequestArrow,
+  GitPullRequestDraft,
   Layers,
   MessageSquare,
   RotateCcw,
   TriangleAlert,
   type LucideIcon,
 } from "lucide-react";
-import type { ActionKind, Person } from "../model/types";
+import type { ActionKind, Person, PrState } from "../model/types";
 
 export function Avatar({ person, size = 20 }: { person: Person; size?: number }) {
   const style = { width: size, height: size };
@@ -47,4 +50,21 @@ export function StatusIcon({ action, size = 16 }: { action: ActionKind; size?: n
 export function displayName(p: Person) {
   if (p.isTeam) return p.login;
   return p.name?.split(" ")[0] || p.login;
+}
+
+const STATE: Record<PrState, { label: string; icon: LucideIcon }> = {
+  draft: { label: "Draft", icon: GitPullRequestDraft },
+  open: { label: "Open", icon: GitPullRequest },
+  approved: { label: "Approved", icon: Check },
+  changes: { label: "Changes requested", icon: GitPullRequestArrow },
+};
+
+export function StateBadge({ state, compact }: { state: PrState; compact?: boolean }) {
+  const { label, icon: Icon } = STATE[state];
+  return (
+    <span className={`state ${state} ${compact ? "compact" : ""}`} title={label}>
+      <Icon size={12} strokeWidth={2} aria-hidden />
+      {compact && state === "changes" ? "Changes" : label}
+    </span>
+  );
 }

@@ -4,7 +4,8 @@ import { ACTION_LABEL, GROUP_LABEL, GROUP_ORDER } from "../model/classify";
 import { changeOf, type Snapshot } from "../model/seen";
 import { ago, clock, days } from "../model/time";
 import type { Item } from "../model/types";
-import { Avatar, displayName, StatusIcon } from "./bits";
+import { prState } from "../model/types";
+import { Avatar, displayName, StateBadge, StatusIcon } from "./bits";
 
 export type GroupBy = "action" | "repo" | "story";
 export type Filter = "all" | "mine" | "reviews";
@@ -30,7 +31,7 @@ export function sections(items: Item[], groupBy: GroupBy): Section[] {
     .map(([key, list]) => ({ key, label: key, items: list, collapsed: false }));
 }
 
-function meta(item: Item, change: string | null, me: string) {
+function meta(item: Item, change: string | null) {
   const { pr, action, stack } = item;
   const parts: { text: string; tone?: string }[] = [];
   if (change) parts.push({ text: change, tone: "new" });
@@ -51,7 +52,6 @@ function meta(item: Item, change: string | null, me: string) {
     parts.push({ text: ACTION_LABEL[action], tone: action === "conflicts" || action === "address-review" ? "warn" : undefined });
   }
   if (stack) parts.push({ text: stack.position === 1 ? `base of ${stack.members.length}` : `${stack.position} of ${stack.members.length} in stack` });
-  if (pr.isDraft && pr.author.login === me) parts.push({ text: "draft" });
   return parts;
 }
 
@@ -67,11 +67,10 @@ interface Props {
   groupBy: GroupBy;
   selectedId: string | null;
   baseline: Snapshot | null;
-  me: string;
   onSelect: (id: string) => void;
 }
 
-export function QueueList({ items, groupBy, selectedId, baseline, me, onSelect }: Props) {
+export function QueueList({ items, groupBy, selectedId, baseline, onSelect }: Props) {
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const list = sections(items, groupBy);
   if (!items.length) return <div className="empty">Nothing here. Every PR you own or were asked to review is accounted for.</div>;
@@ -106,13 +105,14 @@ export function QueueList({ items, groupBy, selectedId, baseline, me, onSelect }
                         <span className="mono">
                           {item.pr.repo}#{item.pr.number}
                         </span>
-                        {meta(item, change, me).map((p, i) => (
+                        {meta(item, change).map((p, i) => (
                           <span key={i} className={p.tone}>
                             {p.text}
                           </span>
                         ))}
                       </div>
                     </div>
+                    <StateBadge state={prState(item.pr.isDraft, item.pr.reviewDecision)} compact />
                     <div className="who">
                       {[...approvers, ...people].slice(0, 3).map((p) => (
                         <Avatar key={p.login} person={p} size={20} />

@@ -19,6 +19,16 @@ export interface Review {
   at: string | null;
 }
 
+/** The PR's own review state, as GitHub shows it, independent of what you should do next. */
+export type PrState = "draft" | "open" | "approved" | "changes";
+
+export function prState(isDraft: boolean, reviewDecision: string | null): PrState {
+  if (isDraft) return "draft";
+  if (reviewDecision === "APPROVED") return "approved";
+  if (reviewDecision === "CHANGES_REQUESTED") return "changes";
+  return "open";
+}
+
 export interface Pr {
   id: string;
   number: number;

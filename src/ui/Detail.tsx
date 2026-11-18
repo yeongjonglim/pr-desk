@@ -2,8 +2,8 @@ import { ArrowLeft, ExternalLink, FileText, Link2 } from "lucide-react";
 import { useState } from "react";
 import { BUSY_AT, reviewCandidates, type ReviewerLoad } from "../model/reviewers";
 import { agoLong } from "../model/time";
-import type { Item, Person } from "../model/types";
-import { Avatar, displayName, StatusIcon } from "./bits";
+import { prState, type Item, type Person } from "../model/types";
+import { Avatar, displayName, StateBadge } from "./bits";
 import { copyText, teamsLine } from "./copy";
 import { CopyButton } from "./CopyButton";
 
@@ -60,10 +60,7 @@ export function Detail({ item, me, loads, pastReviewers, onBack }: Props) {
         </div>
 
         <div className="pills">
-          <span className="pill">
-            <StatusIcon action={item.action} size={13} />
-            {pr.isDraft ? "Draft" : "Ready for review"}
-          </span>
+          <StateBadge state={prState(pr.isDraft, pr.reviewDecision)} />
           {pr.checks === "passing" && <span className="pill green">Checks passed</span>}
           {pr.checks === "failing" && <span className="pill red">Checks failing</span>}
           {pr.checks === "pending" && <span className="pill">Checks running</span>}
@@ -170,7 +167,7 @@ export function Detail({ item, me, loads, pastReviewers, onBack }: Props) {
                   <span className={`node ${m.isDraft ? "draft" : m.reviewDecision === "APPROVED" ? "ok" : ""}`} />
                   <span className="mono">#{m.number}</span>
                   <span className="tx">{m.title.replace(/^\[[^\]]+\]\s*/, "")}</span>
-                  <span className="s">{m.id === pr.id ? "this PR" : m.isDraft ? "draft" : m.reviewDecision === "APPROVED" ? "approved" : "ready"}</span>
+                  <StateBadge state={prState(m.isDraft, m.reviewDecision)} compact />
                 </a>
               ))}
             </div>

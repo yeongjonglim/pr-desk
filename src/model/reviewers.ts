@@ -1,6 +1,6 @@
 import type { RawLoadPr } from "../api/queries";
 import { requestSince, reviewerOf } from "./normalize";
-import type { Person } from "./types";
+import { prState, type Person, type PrState } from "./types";
 
 export interface PendingPr {
   repoFull: string;
@@ -11,6 +11,7 @@ export interface PendingPr {
   since: string;
   mine: boolean;
   isDraft: boolean;
+  state: PrState;
   additions: number;
   deletions: number;
   author: Person;
@@ -40,6 +41,7 @@ export function reviewerLoad(prs: RawLoadPr[], me: string): ReviewerLoad[] {
         since: requestSince(pr.timelineItems.nodes, reviewer.login) ?? pr.createdAt,
         mine: pr.author?.login === me,
         isDraft: pr.isDraft,
+        state: prState(pr.isDraft, pr.reviewDecision),
         additions: pr.additions,
         deletions: pr.deletions,
         author: pr.author ? { login: pr.author.login, avatarUrl: pr.author.avatarUrl, name: pr.author.name } : { login: "ghost" },

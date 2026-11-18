@@ -194,7 +194,7 @@ export function App() {
               </div>
             </div>
             <div className={`work ${showDetail ? "show-det" : ""}`}>
-              <QueueList items={items} groupBy={groupBy} selectedId={selected?.pr.id ?? null} baseline={baseline} me={me.login} onSelect={(id) => {
+              <QueueList items={items} groupBy={groupBy} selectedId={selected?.pr.id ?? null} baseline={baseline} onSelect={(id) => {
                   setSelectedId(id);
                   setShowDetail(true);
                 }} />

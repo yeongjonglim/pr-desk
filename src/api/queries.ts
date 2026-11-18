@@ -56,7 +56,7 @@ export const LOAD_QUERY = `
       pageInfo { hasNextPage endCursor }
       nodes {
         ... on PullRequest {
-          id number title url createdAt isDraft additions deletions
+          id number title url createdAt isDraft additions deletions reviewDecision
           author { login avatarUrl ... on User { name } }
           repository { name nameWithOwner owner { login } }
           reviewRequests(first: 10) { nodes { requestedReviewer { ${REVIEWER} } } }
@@ -119,6 +119,7 @@ export interface RawLoadPr {
   isDraft: boolean;
   additions: number;
   deletions: number;
+  reviewDecision: "APPROVED" | "CHANGES_REQUESTED" | "REVIEW_REQUIRED" | null;
   author: { login: string; avatarUrl?: string; name?: string | null } | null;
   repository: { name: string; nameWithOwner: string; owner: { login: string } };
   reviewRequests: { nodes: { requestedReviewer: RawReviewer | null }[] };
