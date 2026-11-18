@@ -1,4 +1,11 @@
-import type { Pr } from "../model/types";
+export interface Linkable {
+  title: string;
+  url: string;
+  repo: string;
+  number: number;
+  additions: number;
+  deletions: number;
+}
 
 function escape(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -9,13 +16,19 @@ function fmt(n: number) {
 }
 
 // Teams keeps the HTML link when pasting, and falls back to the plain line elsewhere.
-export function teamsLine(pr: Pr) {
+export function teamsLine(pr: Linkable) {
   const size = `(+${fmt(pr.additions)}/−${fmt(pr.deletions)})`;
   const ref = `${pr.repo}#${pr.number}`;
   return {
     html: `<a href="${escape(pr.url)}">${escape(pr.title)}</a> ${size} · ${escape(ref)}`,
     text: `${pr.title} ${size} · ${ref} ${pr.url}`,
   };
+}
+
+/** One line per PR, the same shape as a single copy. */
+export function teamsList(prs: Linkable[]) {
+  const lines = prs.map(teamsLine);
+  return { html: lines.map((l) => l.html).join("<br>"), text: lines.map((l) => l.text).join("\n") };
 }
 
 // navigator.clipboard only exists in secure contexts, so over a plain-http NetBird

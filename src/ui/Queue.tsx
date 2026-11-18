@@ -104,7 +104,7 @@ export function QueueList({ items, groupBy, selectedId, baseline, me, onSelect }
                       <div className="t">{item.pr.title}</div>
                       <div className="m">
                         <span className="mono">
-                          {groupBy === "repo" ? `#${item.pr.number}` : `${item.pr.repo}#${item.pr.number}`}
+                          {item.pr.repo}#{item.pr.number}
                         </span>
                         {meta(item, change, me).map((p, i) => (
                           <span key={i} className={p.tone}>

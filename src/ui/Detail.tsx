@@ -1,10 +1,11 @@
-import { ArrowLeft, Check, Copy, ExternalLink, FileText, Link2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileText, Link2 } from "lucide-react";
 import { useState } from "react";
 import { BUSY_AT, reviewCandidates, type ReviewerLoad } from "../model/reviewers";
 import { agoLong } from "../model/time";
-import type { Item, Person, Pr } from "../model/types";
+import type { Item, Person } from "../model/types";
 import { Avatar, displayName, StatusIcon } from "./bits";
-import { copyRich, copyText, teamsLine } from "./copy";
+import { copyText, teamsLine } from "./copy";
+import { CopyButton } from "./CopyButton";
 
 interface Props {
   item: Item;
@@ -12,21 +13,6 @@ interface Props {
   loads: ReviewerLoad[] | null;
   pastReviewers: Person[];
   onBack: () => void;
-}
-
-function CopyButton({ pr, primary, label = "Copy for Teams" }: { pr: Pr; primary?: boolean; label?: string }) {
-  const [state, setState] = useState<"idle" | "done" | "failed">("idle");
-  async function go() {
-    const { html, text } = teamsLine(pr);
-    setState((await copyRich(html, text)) ? "done" : "failed");
-    setTimeout(() => setState("idle"), 1800);
-  }
-  return (
-    <button className={`btn ${primary ? "pri" : ""}`} onClick={go}>
-      {state === "done" ? <Check size={14} /> : <Copy size={14} />}
-      {state === "done" ? "Copied" : state === "failed" ? "Copy blocked" : label}
-    </button>
-  );
 }
 
 const REVIEW_STATE: Record<string, { text: string; tone: string }> = {
@@ -164,7 +150,7 @@ export function Detail({ item, me, loads, pastReviewers, onBack }: Props) {
             (+{pr.additions.toLocaleString("en")}/−{pr.deletions.toLocaleString("en")}) · {pr.repo}#{pr.number}
           </div>
           <div className="acts">
-            <CopyButton pr={pr} primary />
+            <CopyButton get={() => teamsLine(pr)} label="Copy for Teams" primary />
             {asking && chosen && (
               <a className="btn" href={pr.url} target="_blank" rel="noreferrer">
                 Request {displayName(chosen.person)} on GitHub

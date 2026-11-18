@@ -56,8 +56,8 @@ export const LOAD_QUERY = `
       pageInfo { hasNextPage endCursor }
       nodes {
         ... on PullRequest {
-          id number title url createdAt isDraft
-          author { login }
+          id number title url createdAt isDraft additions deletions
+          author { login avatarUrl ... on User { name } }
           repository { name nameWithOwner owner { login } }
           reviewRequests(first: 10) { nodes { requestedReviewer { ${REVIEWER} } } }
           ${REQUEST_EVENTS}
@@ -117,7 +117,9 @@ export interface RawLoadPr {
   url: string;
   createdAt: string;
   isDraft: boolean;
-  author: { login: string } | null;
+  additions: number;
+  deletions: number;
+  author: { login: string; avatarUrl?: string; name?: string | null } | null;
   repository: { name: string; nameWithOwner: string; owner: { login: string } };
   reviewRequests: { nodes: { requestedReviewer: RawReviewer | null }[] };
   timelineItems: { nodes: RawRequestEvent[] };

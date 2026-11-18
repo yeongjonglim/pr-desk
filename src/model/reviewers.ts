@@ -10,6 +10,10 @@ export interface PendingPr {
   url: string;
   since: string;
   mine: boolean;
+  isDraft: boolean;
+  additions: number;
+  deletions: number;
+  author: Person;
 }
 
 export interface ReviewerLoad {
@@ -35,6 +39,10 @@ export function reviewerLoad(prs: RawLoadPr[], me: string): ReviewerLoad[] {
         url: pr.url,
         since: requestSince(pr.timelineItems.nodes, reviewer.login) ?? pr.createdAt,
         mine: pr.author?.login === me,
+        isDraft: pr.isDraft,
+        additions: pr.additions,
+        deletions: pr.deletions,
+        author: pr.author ? { login: pr.author.login, avatarUrl: pr.author.avatarUrl, name: pr.author.name } : { login: "ghost" },
       };
       const load = byReviewer.get(reviewer.login) ?? { reviewer, pending: [], mine: [], oldest: null };
       load.pending.push(entry);
@@ -44,7 +52,8 @@ export function reviewerLoad(prs: RawLoadPr[], me: string): ReviewerLoad[] {
     }
   }
   for (const load of byReviewer.values()) {
-    load.mine.sort((a, b) => b.since.localeCompare(a.since));
+    load.mine.sort((a, b) => a.since.localeCompare(b.since));
+    load.pending.sort((a, b) => a.since.localeCompare(b.since));
   }
   return [...byReviewer.values()].sort(
     (a, b) => b.mine.length - a.mine.length || b.pending.length - a.pending.length || a.reviewer.login.localeCompare(b.reviewer.login),

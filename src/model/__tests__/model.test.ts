@@ -102,6 +102,8 @@ function loadPr(author: string, reviewers: string[], at = "2026-11-10T00:00:00Z"
     url: "",
     createdAt: "2026-11-01T00:00:00Z",
     isDraft: false,
+    additions: 1,
+    deletions: 1,
     author: { login: author },
     repository: { name: "app", nameWithOwner: "acme/app", owner: { login: "acme" } },
     reviewRequests: { nodes: reviewers.map((login) => ({ requestedReviewer: { __typename: "User" as const, login } })) },

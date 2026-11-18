@@ -19,9 +19,10 @@ interface Props {
   error: string | null;
   fetching: boolean;
   onView: (v: View) => void;
+  onReviewer: (login: string) => void;
 }
 
-export function Sidebar({ me, org, view, queueCount, reviewerCount, loads, syncedAt, error, fetching, onView }: Props) {
+export function Sidebar({ me, org, view, queueCount, reviewerCount, loads, syncedAt, error, fetching, onView, onReviewer }: Props) {
   const top = loads.filter((l) => l.mine.length > 0 && l.reviewer.login !== me.login).slice(0, 6);
   return (
     <aside className="side">
@@ -46,7 +47,7 @@ export function Sidebar({ me, org, view, queueCount, reviewerCount, loads, synce
             <span>yours / all</span>
           </div>
           {top.map((l) => (
-            <a key={l.reviewer.login} href="#reviewers" className="rv" onClick={() => onView("reviewers")}>
+            <a key={l.reviewer.login} href="#reviewers" className="rv" onClick={() => onReviewer(l.reviewer.login)}>
               <Avatar person={l.reviewer} size={18} />
               <span className="rv-name">{displayName(l.reviewer)}</span>
               <span className={`load ${l.pending.length >= BUSY_AT ? "hot" : ""}`}>

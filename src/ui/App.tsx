@@ -52,6 +52,7 @@ export function App() {
   const [filter, setFilter] = useState<Filter>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showDetail, setShowDetail] = useState(false);
+  const [reviewer, setReviewer] = useState<string | null>(null);
   const [baseline, setBaseline] = useState<Snapshot | null>(loadSnapshot);
   const itemsRef = useRef<Item[]>([]);
 
@@ -145,6 +146,10 @@ export function App() {
         error={desk.error?.message ?? null}
         fetching={desk.isFetching}
         onView={setView}
+        onReviewer={(login) => {
+          setView("reviewers");
+          setReviewer(login);
+        }}
       />
       <main className="main">
         {view === "queue" ? (
@@ -212,7 +217,7 @@ export function App() {
                 </span>
               </div>
             </div>
-            <Reviewers load={load.data} me={me} />
+            <Reviewers load={load.data} me={me} selected={reviewer} onSelect={setReviewer} />
           </>
         )}
       </main>
